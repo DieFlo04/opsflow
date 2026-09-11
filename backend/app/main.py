@@ -1,10 +1,16 @@
 from fastapi import FastAPI
 
+from backend.app.api.users import router as users_router
+
+
 app = FastAPI(
     title="OpsFlow API",
     description="IT Operations & Automation Platform",
     version="1.0.0"
 )
+
+
+app.include_router(users_router, prefix="/api")
 
 
 @app.get("/health")
