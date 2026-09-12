@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -8,6 +10,12 @@ from backend.app.models.category import Category
 from backend.app.models.user import User
 from backend.app.schemas.incident import IncidentCreate, IncidentUpdate, IncidentResponse
 
+ALLOWED_STATUS_TRANSITIONS = {
+    "OPEN": {"OPEN", "IN_PROGRESS"},
+    "IN_PROGRESS": {"OPEN", "IN_PROGRESS", "RESOLVED"},
+    "RESOLVED": {"RESOLVED", "IN_PROGRESS", "CLOSED"},
+    "CLOSED": {"CLOSED", "IN_PROGRESS"}
+}
 
 router = APIRouter(
     prefix="/incidents",
@@ -112,6 +120,64 @@ def update_incident(
     update_data = incident_data.model_dump(
         exclude_unset=True
     )
+
+    if "system_id" in update_data:
+        system = db.query(System).filter(
+            System.id == update_data["system_id"]
+        ).first()
+
+        if not system:
+            raise HTTPException(
+                status_code=404,
+                detail="System not found"
+            )
+
+    if "category_id" in update_data:
+        category = db.query(Category).filter(
+            Category.id == update_data["category_id"]
+        ).first()
+
+        if not category:
+            raise HTTPException(
+                status_code=404,
+                detail="Category not found"
+            )
+
+    if "assigned_to" in update_data:
+        if update_data["assigned_to"] is not None:
+            user = db.query(User).filter(
+                User.id == update_data["assigned_to"]
+            ).first()
+
+            if not user:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Assigned user not found"
+                )
+
+    if "status" in update_data:
+        current_status = incident.status
+        new_status = update_data["status"]
+
+        allowed_statuses = ALLOWED_STATUS_TRANSITIONS.get(
+            current_status,
+            set()
+        )
+
+        if new_status not in allowed_statuses:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Invalid status transition: "
+                    f"{current_status} -> {new_status}"
+                )
+            )
+
+        if new_status == "RESOLVED":
+            if incident.resolved_at is None:
+                incident.resolved_at = datetime.utcnow()
+        else:
+            incident.resolved_at = None
 
     for field, value in update_data.items():
         setattr(incident, field, value)

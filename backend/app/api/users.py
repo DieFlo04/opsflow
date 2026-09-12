@@ -106,7 +106,21 @@ def update_user(
             detail="User not found"
         )
 
-    update_data = user_data.model_dump(exclude_unset=True)
+    update_data = user_data.model_dump(
+        exclude_unset=True
+    )
+
+    if "email" in update_data:
+        existing_user = db.query(User).filter(
+            User.email == update_data["email"],
+            User.id != user_id
+        ).first()
+
+        if existing_user:
+            raise HTTPException(
+                status_code=400,
+                detail="Email already registered"
+            )
 
     for field, value in update_data.items():
         setattr(user, field, value)
