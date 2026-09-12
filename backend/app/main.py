@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from backend.app.api.users import router as users_router
+from backend.app.api.incidents import router as incidents_router
 
 
 app = FastAPI(
@@ -11,6 +12,7 @@ app = FastAPI(
 
 
 app.include_router(users_router, prefix="/api")
+app.include_router(incidents_router, prefix="/api")
 
 
 @app.get("/health")
