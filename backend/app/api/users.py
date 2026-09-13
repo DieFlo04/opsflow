@@ -8,6 +8,7 @@ from backend.app.schemas.user import UserCreate, UserResponse, UserUpdate
 from backend.app.services.user_service import (
     create_user,
     delete_user,
+    email_exists,
     get_user_by_id,
     get_users,
     update_user,
@@ -59,15 +60,14 @@ def create_new_user(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("admin"))
 ):
-    existing_email = db.query(User).filter(
-        User.email == user_data.email
-    ).first()
-
-    if existing_email:
+    if email_exists(
+    db,
+    user_data.email
+):
         raise HTTPException(
-            status_code=400,
-            detail="Email already registered"
-        )
+        status_code=400,
+        detail="Email already registered"
+    )
 
     return create_user(
         db,
@@ -97,12 +97,11 @@ def update_existing_user(
         )
 
     if user_data.email is not None:
-        existing_email = db.query(User).filter(
-            User.email == user_data.email,
-            User.id != user_id
-        ).first()
-
-        if existing_email:
+        if email_exists(
+            db,
+            user_data.email,
+            exclude_user_id=user_id
+        ):
             raise HTTPException(
                 status_code=400,
                 detail="Email already registered"

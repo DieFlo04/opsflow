@@ -22,6 +22,22 @@ def get_user_by_email(
         User.email == email
     ).first()
 
+def email_exists(
+    db: Session,
+    email: str,
+    exclude_user_id: int | None = None
+):
+    query = db.query(User).filter(
+        User.email == email
+    )
+
+    if exclude_user_id is not None:
+        query = query.filter(
+            User.id != exclude_user_id
+        )
+
+    return query.first() is not None
+
 
 def get_users(
     db: Session
