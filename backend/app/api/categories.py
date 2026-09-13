@@ -4,13 +4,19 @@ from sqlalchemy.orm import Session
 from backend.app.core.database import get_db
 from backend.app.core.dependencies import get_current_user, require_role
 from backend.app.models.user import User
-from backend.app.models.category import Category
 from backend.app.schemas.category import (
     CategoryCreate,
-    CategoryUpdate,
-    CategoryResponse
+    CategoryResponse,
+    CategoryUpdate
 )
-
+from backend.app.services.category_service import (
+    create_category,
+    delete_category,
+    get_categories,
+    get_category_by_id,
+    get_category_by_name,
+    update_category
+)
 
 router = APIRouter(
     prefix="/categories",
@@ -18,15 +24,55 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=CategoryResponse)
-def create_category(
+@router.get(
+    "/",
+    response_model=list[CategoryResponse]
+)
+def list_categories(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return get_categories(db)
+
+
+@router.get(
+    "/{category_id}",
+    response_model=CategoryResponse
+)
+def get_category(
+    category_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    category = get_category_by_id(
+        db,
+        category_id
+    )
+
+    if not category:
+        raise HTTPException(
+            status_code=404,
+            detail="Category not found"
+        )
+
+    return category
+
+
+@router.post(
+    "/",
+    response_model=CategoryResponse
+)
+def create_new_category(
     category_data: CategoryCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("admin"))
+    current_user: User = Depends(
+        require_role("admin")
+    )
 ):
-    existing_category = db.query(Category).filter(
-        Category.name == category_data.name
-    ).first()
+    existing_category = get_category_by_name(
+        db,
+        category_data.name
+    )
 
     if existing_category:
         raise HTTPException(
@@ -34,56 +80,28 @@ def create_category(
             detail="Category already exists"
         )
 
-    category = Category(
-        name=category_data.name
+    return create_category(
+        db,
+        category_data
     )
 
-    db.add(category)
-    db.commit()
-    db.refresh(category)
 
-    return category
-
-
-@router.get("/", response_model=list[CategoryResponse])
-def get_categories(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    categories = db.query(Category).all()
-
-    return categories
-
-
-@router.get("/{category_id}", response_model=CategoryResponse)
-def get_category(
-    category_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    category = db.query(Category).filter(
-        Category.id == category_id
-    ).first()
-
-    if not category:
-        raise HTTPException(
-            status_code=404,
-            detail="Category not found"
-        )
-
-    return category
-
-
-@router.put("/{category_id}", response_model=CategoryResponse)
-def update_category(
+@router.put(
+    "/{category_id}",
+    response_model=CategoryResponse
+)
+def update_existing_category(
     category_id: int,
     category_data: CategoryUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("admin"))
+    current_user: User = Depends(
+        require_role("admin")
+    )
 ):
-    category = db.query(Category).filter(
-        Category.id == category_id
-    ).first()
+    category = get_category_by_id(
+        db,
+        category_id
+    )
 
     if not category:
         raise HTTPException(
@@ -91,40 +109,42 @@ def update_category(
             detail="Category not found"
         )
 
-    update_data = category_data.model_dump(
-        exclude_unset=True
-    )
+    if category_data.name is not None:
+        existing_category = get_category_by_name(
+            db,
+            category_data.name
+        )
 
-    if "name" in update_data:
-        existing_category = db.query(Category).filter(
-            Category.name == update_data["name"],
-            Category.id != category_id
-        ).first()
-
-        if existing_category:
+        if (
+            existing_category
+            and existing_category.id != category_id
+        ):
             raise HTTPException(
                 status_code=400,
                 detail="Category already exists"
             )
 
-    for field, value in update_data.items():
-        setattr(category, field, value)
-
-    db.commit()
-    db.refresh(category)
-
-    return category
+    return update_category(
+        db,
+        category,
+        category_data
+    )
 
 
-@router.delete("/{category_id}")
-def delete_category(
+@router.delete(
+    "/{category_id}"
+)
+def delete_existing_category(
     category_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("admin"))
+    current_user: User = Depends(
+        require_role("admin")
+    )
 ):
-    category = db.query(Category).filter(
-        Category.id == category_id
-    ).first()
+    category = get_category_by_id(
+        db,
+        category_id
+    )
 
     if not category:
         raise HTTPException(
@@ -132,8 +152,10 @@ def delete_category(
             detail="Category not found"
         )
 
-    db.delete(category)
-    db.commit()
+    delete_category(
+        db,
+        category
+    )
 
     return {
         "message": "Category deleted successfully"
