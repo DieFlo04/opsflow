@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
+from backend.app.core.dependencies import get_current_user, require_role
 from backend.app.models.user import User
 from backend.app.schemas.user import UserCreate, UserUpdate, UserResponse
 from backend.app.core.security import hash_password
-
 
 router = APIRouter(
     prefix="/users",
@@ -14,7 +14,10 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[UserResponse])
-def get_users(db: Session = Depends(get_db)):
+def get_users(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     users = db.query(User).all()
 
     return users
@@ -23,7 +26,8 @@ def get_users(db: Session = Depends(get_db)):
 @router.post("/", response_model=UserResponse)
 def create_user(
     user_data: UserCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin"))
 ):
     existing_user = db.query(User).filter(
         User.email == user_data.email
@@ -52,7 +56,8 @@ def create_user(
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
     user_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     user = db.query(User).filter(
         User.id == user_id
@@ -70,7 +75,8 @@ def get_user(
 @router.delete("/{user_id}")
 def delete_user(
     user_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin"))
 ):
     user = db.query(User).filter(
         User.id == user_id
@@ -94,7 +100,8 @@ def delete_user(
 def update_user(
     user_id: int,
     user_data: UserUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin"))
 ):
     user = db.query(User).filter(
         User.id == user_id

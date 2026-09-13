@@ -1,14 +1,19 @@
-from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
+from backend.app.core.dependencies import get_current_user, require_role
+
 from backend.app.models.incident import Incident
 from backend.app.models.system import System
 from backend.app.models.category import Category
 from backend.app.models.user import User
-from backend.app.schemas.incident import IncidentCreate, IncidentUpdate, IncidentResponse
+
+from backend.app.schemas.incident import (
+    IncidentCreate,
+    IncidentUpdate,
+    IncidentResponse
+)
 
 ALLOWED_STATUS_TRANSITIONS = {
     "OPEN": {"OPEN", "IN_PROGRESS"},
@@ -26,7 +31,8 @@ router = APIRouter(
 @router.post("/", response_model=IncidentResponse)
 def create_incident(
     incident_data: IncidentCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     system = db.query(System).filter(
         System.id == incident_data.system_id
@@ -76,7 +82,8 @@ def create_incident(
 
 @router.get("/", response_model=list[IncidentResponse])
 def get_incidents(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     incidents = db.query(Incident).all()
     
@@ -86,7 +93,8 @@ def get_incidents(
 @router.get("/{incident_id}", response_model=IncidentResponse)
 def get_incident(
     incident_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     incident = db.query(Incident).filter(
         Incident.id == incident_id
@@ -105,7 +113,10 @@ def get_incident(
 def update_incident(
     incident_id: int,
     incident_data: IncidentUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+    require_role("technician", "admin")
+)
 ):
     incident = db.query(Incident).filter(
         Incident.id == incident_id
@@ -191,7 +202,10 @@ def update_incident(
 @router.delete("/{incident_id}")
 def delete_incident(
     incident_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+    require_role("admin")
+    )
 ):
     incident = db.query(Incident).filter(
         Incident.id == incident_id

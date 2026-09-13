@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
+from backend.app.core.dependencies import get_current_user, require_role
+from backend.app.models.user import User
 from backend.app.models.category import Category
 from backend.app.schemas.category import (
     CategoryCreate,
@@ -19,7 +21,8 @@ router = APIRouter(
 @router.post("/", response_model=CategoryResponse)
 def create_category(
     category_data: CategoryCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin"))
 ):
     existing_category = db.query(Category).filter(
         Category.name == category_data.name
@@ -44,7 +47,8 @@ def create_category(
 
 @router.get("/", response_model=list[CategoryResponse])
 def get_categories(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     categories = db.query(Category).all()
 
@@ -54,7 +58,8 @@ def get_categories(
 @router.get("/{category_id}", response_model=CategoryResponse)
 def get_category(
     category_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     category = db.query(Category).filter(
         Category.id == category_id
@@ -73,7 +78,8 @@ def get_category(
 def update_category(
     category_id: int,
     category_data: CategoryUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin"))
 ):
     category = db.query(Category).filter(
         Category.id == category_id
@@ -113,7 +119,8 @@ def update_category(
 @router.delete("/{category_id}")
 def delete_category(
     category_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin"))
 ):
     category = db.query(Category).filter(
         Category.id == category_id

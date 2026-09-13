@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
+from backend.app.core.dependencies import get_current_user, require_role
+from backend.app.models.user import User
 from backend.app.models.comment import Comment
 from backend.app.models.incident import Incident
-from backend.app.models.user import User
 from backend.app.schemas.comment import CommentCreate, CommentUpdate, CommentResponse
 
 router = APIRouter(
@@ -15,7 +16,8 @@ router = APIRouter(
 @router.post("/", response_model=CommentResponse)
 def create_comment(
     comment_data: CommentCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     incident = db.query(Incident).filter(
         Incident.id == comment_data.incident_id
@@ -52,7 +54,8 @@ def create_comment(
 
 @router.get("/", response_model=list[CommentResponse])
 def get_comments(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     comments = db.query(Comment).all()
     
@@ -62,7 +65,8 @@ def get_comments(
 @router.get("/{comment_id}", response_model=CommentResponse)
 def get_comment(
     comment_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     comment = db.query(Comment).filter(
         Comment.id == comment_id
@@ -81,7 +85,10 @@ def get_comment(
 def update_comment(
     comment_id: int,
     comment_data: CommentUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+    require_role("technician", "admin")
+)
 ):
     comment = db.query(Comment).filter(
         Comment.id == comment_id
@@ -109,7 +116,10 @@ def update_comment(
 @router.delete("/{comment_id}")
 def delete_comment(
     comment_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+    require_role("admin")
+)
 ):
     comment = db.query(Comment).filter(
         Comment.id == comment_id

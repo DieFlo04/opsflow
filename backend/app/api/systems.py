@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
+from backend.app.core.dependencies import get_current_user, require_role
+from backend.app.models.user import User
 from backend.app.models.system import System
 from backend.app.schemas.system import (
     SystemCreate,
@@ -19,7 +21,8 @@ router = APIRouter(
 @router.post("/", response_model=SystemResponse)
 def create_system(
     system_data: SystemCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin"))
 ):
     existing_system = db.query(System).filter(
         System.name == system_data.name
@@ -46,7 +49,8 @@ def create_system(
 
 @router.get("/", response_model=list[SystemResponse])
 def get_systems(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     systems = db.query(System).all()
 
@@ -56,7 +60,8 @@ def get_systems(
 @router.get("/{system_id}", response_model=SystemResponse)
 def get_system(
     system_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     system = db.query(System).filter(
         System.id == system_id
@@ -75,7 +80,8 @@ def get_system(
 def update_system(
     system_id: int,
     system_data: SystemUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin"))
 ):
     system = db.query(System).filter(
         System.id == system_id
@@ -115,7 +121,8 @@ def update_system(
 @router.delete("/{system_id}")
 def delete_system(
     system_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin"))
 ):
     system = db.query(System).filter(
         System.id == system_id
