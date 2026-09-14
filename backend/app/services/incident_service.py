@@ -27,6 +27,39 @@ def get_incident_by_id(
     ).first()
 
 
+def system_exists(
+    db: Session,
+    system_id: int
+):
+    from backend.app.models.system import System
+
+    return db.query(System).filter(
+        System.id == system_id
+    ).first() is not None
+
+
+def category_exists(
+    db: Session,
+    category_id: int
+):
+    from backend.app.models.category import Category
+
+    return db.query(Category).filter(
+        Category.id == category_id
+    ).first() is not None
+
+
+def user_exists(
+    db: Session,
+    user_id: int
+):
+    from backend.app.models.user import User
+
+    return db.query(User).filter(
+        User.id == user_id
+    ).first() is not None
+
+
 def create_incident(
     db: Session,
     incident_data: IncidentCreate

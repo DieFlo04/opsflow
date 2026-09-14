@@ -5,19 +5,20 @@ from backend.app.core.database import get_db
 from backend.app.core.dependencies import get_current_user, require_role
 from backend.app.models.incident import Incident
 from backend.app.models.user import User
-from backend.app.models.system import System
-from backend.app.models.category import Category
 from backend.app.schemas.incident import (
     IncidentCreate,
     IncidentUpdate,
     IncidentResponse
 )
 from backend.app.services.incident_service import (
+    category_exists,
     create_incident,
     delete_incident,
     get_incident_by_id,
     get_incidents,
-    update_incident
+    system_exists,
+    update_incident,
+    user_exists
 )
 
 
@@ -70,31 +71,28 @@ def create_new_incident(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    system = db.query(System).filter(
-        System.id == incident_data.system_id
-    ).first()
-
-    if not system:
+    if not system_exists(
+        db,
+        incident_data.system_id
+    ):
         raise HTTPException(
             status_code=404,
             detail="System not found"
         )
 
-    category = db.query(Category).filter(
-        Category.id == incident_data.category_id
-    ).first()
-
-    if not category:
+    if not category_exists(
+        db,
+        incident_data.category_id
+    ):
         raise HTTPException(
             status_code=404,
             detail="Category not found"
         )
 
-    user = db.query(User).filter(
-        User.id == incident_data.created_by
-    ).first()
-
-    if not user:
+    if not user_exists(
+        db,
+        incident_data.created_by
+    ):
         raise HTTPException(
             status_code=404,
             detail="User not found"
@@ -130,36 +128,33 @@ def update_existing_incident(
         )
 
     if incident_data.system_id is not None:
-        system = db.query(System).filter(
-            System.id == incident_data.system_id
-        ).first()
-
-        if not system:
+        if not system_exists(
+            db,
+            incident_data.system_id
+        ):
             raise HTTPException(
                 status_code=404,
                 detail="System not found"
             )
 
     if incident_data.category_id is not None:
-        category = db.query(Category).filter(
-            Category.id == incident_data.category_id
-        ).first()
-
-        if not category:
+        if not category_exists(
+            db,
+            incident_data.category_id
+        ):
             raise HTTPException(
                 status_code=404,
                 detail="Category not found"
             )
 
     if incident_data.assigned_to is not None:
-        user = db.query(User).filter(
-            User.id == incident_data.assigned_to
-        ).first()
-
-        if not user:
+        if not user_exists(
+            db,
+            incident_data.assigned_to
+        ):
             raise HTTPException(
                 status_code=404,
-                detail="Assigned user not found"
+                detail="User not found"
             )
 
     try:
