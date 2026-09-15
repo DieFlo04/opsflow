@@ -40,11 +40,16 @@ def create_system(
         else system_data.status
     )
 
-    db.add(system)
-    db.commit()
-    db.refresh(system)
+    try:
+        db.add(system)
+        db.commit()
+        db.refresh(system)
 
-    return system
+        return system
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def update_system(
@@ -65,15 +70,25 @@ def update_system(
             else system_data.status
         )
 
-    db.commit()
-    db.refresh(system)
+    try:
+        db.commit()
+        db.refresh(system)
 
-    return system
+        return system
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def delete_system(
     db: Session,
     system: System
 ):
-    db.delete(system)
-    db.commit()
+    try:
+        db.delete(system)
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise

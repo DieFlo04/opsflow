@@ -36,11 +36,16 @@ def create_category(
         name=category_data.name
     )
 
-    db.add(category)
-    db.commit()
-    db.refresh(category)
+    try:
+        db.add(category)
+        db.commit()
+        db.refresh(category)
 
-    return category
+        return category
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def update_category(
@@ -51,15 +56,25 @@ def update_category(
     if category_data.name is not None:
         category.name = category_data.name
 
-    db.commit()
-    db.refresh(category)
+    try:
+        db.commit()
+        db.refresh(category)
 
-    return category
+        return category
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def delete_category(
     db: Session,
     category: Category
 ):
-    db.delete(category)
-    db.commit()
+    try:
+        db.delete(category)
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise

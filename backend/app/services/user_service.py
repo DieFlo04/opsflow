@@ -60,11 +60,16 @@ def create_user(
         role=user_data.role
     )
 
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    try:
+        db.add(user)
+        db.commit()
+        db.refresh(user)
 
-    return user
+        return user
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def update_user(
@@ -86,15 +91,25 @@ def update_user(
     if user_data.role is not None:
         user.role = user_data.role
 
-    db.commit()
-    db.refresh(user)
+    try:
+        db.commit()
+        db.refresh(user)
 
-    return user
+        return user
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def delete_user(
     db: Session,
     user: User
 ):
-    db.delete(user)
-    db.commit()
+    try:
+        db.delete(user)
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise

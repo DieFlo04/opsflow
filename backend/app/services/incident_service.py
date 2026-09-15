@@ -73,11 +73,16 @@ def create_incident(
         created_by=incident_data.created_by
     )
 
-    db.add(incident)
-    db.commit()
-    db.refresh(incident)
+    try:
+        db.add(incident)
+        db.commit()
+        db.refresh(incident)
 
-    return incident
+        return incident
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def update_incident(
@@ -119,15 +124,25 @@ def update_incident(
 
         incident.status = new_status
 
-    db.commit()
-    db.refresh(incident)
+    try:
+        db.commit()
+        db.refresh(incident)
 
-    return incident
+        return incident
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def delete_incident(
     db: Session,
     incident: Incident
 ):
-    db.delete(incident)
-    db.commit()
+    try:
+        db.delete(incident)
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise

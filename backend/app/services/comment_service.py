@@ -50,11 +50,16 @@ def create_comment(
         comment=comment_data.comment
     )
 
-    db.add(comment)
-    db.commit()
-    db.refresh(comment)
+    try:
+        db.add(comment)
+        db.commit()
+        db.refresh(comment)
 
-    return comment
+        return comment
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def update_comment(
@@ -65,15 +70,25 @@ def update_comment(
     if comment_data.comment is not None:
         comment.comment = comment_data.comment
 
-    db.commit()
-    db.refresh(comment)
+    try:
+        db.commit()
+        db.refresh(comment)
 
-    return comment
+        return comment
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 def delete_comment(
     db: Session,
     comment: Comment
 ):
-    db.delete(comment)
-    db.commit()
+    try:
+        db.delete(comment)
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise
