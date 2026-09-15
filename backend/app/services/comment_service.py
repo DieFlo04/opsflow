@@ -18,6 +18,27 @@ def get_comment_by_id(
         Comment.id == comment_id
     ).first()
 
+def incident_exists(
+    db: Session,
+    incident_id: int
+):
+    from backend.app.models.incident import Incident
+
+    return db.query(Incident).filter(
+        Incident.id == incident_id
+    ).first() is not None
+
+
+def user_exists(
+    db: Session,
+    user_id: int
+):
+    from backend.app.models.user import User
+
+    return db.query(User).filter(
+        User.id == user_id
+    ).first() is not None
+
 
 def create_comment(
     db: Session,

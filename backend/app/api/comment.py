@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from backend.app.core.database import get_db
 from backend.app.core.dependencies import get_current_user, require_role
 from backend.app.models.comment import Comment
-from backend.app.models.incident import Incident
 from backend.app.models.user import User
 from backend.app.schemas.comment import (
     CommentCreate,
@@ -16,7 +15,9 @@ from backend.app.services.comment_service import (
     delete_comment,
     get_comment_by_id,
     get_comments,
-    update_comment
+    incident_exists,
+    update_comment,
+    user_exists
 )
 
 router = APIRouter(
@@ -68,21 +69,19 @@ def create_new_comment(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    incident = db.query(Incident).filter(
-        Incident.id == comment_data.incident_id
-    ).first()
-
-    if not incident:
+    if not incident_exists(
+        db,
+        comment_data.incident_id
+    ):
         raise HTTPException(
             status_code=404,
             detail="Incident not found"
         )
 
-    user = db.query(User).filter(
-        User.id == comment_data.user_id
-    ).first()
-
-    if not user:
+    if not user_exists(
+        db,
+        comment_data.user_id
+    ):
         raise HTTPException(
             status_code=404,
             detail="User not found"
