@@ -6,6 +6,8 @@ from backend.app.api.comment import router as comments_router
 from backend.app.api.systems import router as systems_router
 from backend.app.api.categories import router as categories_router
 from backend.app.api.auth import router as auth_router
+from backend.app.api.metrics import router as metrics_router
+
 
 app = FastAPI(
     title="OpsFlow API",
@@ -20,6 +22,8 @@ app.include_router(comments_router, prefix="/api")
 app.include_router(systems_router, prefix="/api")
 app.include_router(categories_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
+app.include_router(metrics_router, prefix="/api")
+
 
 @app.get("/health")
 def health_check():

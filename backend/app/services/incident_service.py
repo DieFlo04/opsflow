@@ -1,8 +1,9 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
 from backend.app.models.incident import Incident
 from backend.app.schemas.incident import IncidentCreate, IncidentUpdate
-
 
 ALLOWED_STATUS_TRANSITIONS = {
     "OPEN": {"OPEN", "IN_PROGRESS"},
@@ -109,20 +110,27 @@ def update_incident(
         incident.assigned_to = incident_data.assigned_to
 
     if incident_data.status is not None:
+        old_status = incident.status
         new_status = incident_data.status.value
 
         allowed_statuses = ALLOWED_STATUS_TRANSITIONS.get(
-            incident.status,
+            old_status,
             set()
         )
 
         if new_status not in allowed_statuses:
             raise ValueError(
                 f"Invalid status transition: "
-                f"{incident.status} -> {new_status}"
+                f"{old_status} -> {new_status}"
             )
 
         incident.status = new_status
+
+        if new_status == "RESOLVED":
+            incident.resolved_at = datetime.utcnow()
+
+        elif old_status == "RESOLVED":
+            incident.resolved_at = None
 
     try:
         db.commit()
