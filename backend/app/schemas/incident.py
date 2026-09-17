@@ -52,3 +52,11 @@ class IncidentResponse(BaseModel):
     resolved_at: datetime | None
 
     model_config = ConfigDict(from_attributes=True)
+    
+
+class IncidentListResponse(BaseModel):
+    items: list[IncidentResponse]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int

@@ -1,3 +1,4 @@
+import math
 from datetime import datetime
 
 from sqlalchemy.orm import Session
@@ -14,9 +15,45 @@ ALLOWED_STATUS_TRANSITIONS = {
 
 
 def get_incidents(
-    db: Session
+    db: Session,
+    status: str | None = None,
+    priority: str | None = None,
+    system_id: int | None = None,
+    category_id: int | None = None,
+    page: int = 1,
+    page_size: int = 10
 ):
-    return db.query(Incident).all()
+    query = db.query(Incident)
+
+    if status is not None:
+        query = query.filter(Incident.status == status)
+
+    if priority is not None:
+        query = query.filter(Incident.priority == priority)
+
+    if system_id is not None:
+        query = query.filter(Incident.system_id == system_id)
+
+    if category_id is not None:
+        query = query.filter(Incident.category_id == category_id)
+
+    total = query.count()
+    
+    total_pages = math.ceil(total / page_size)
+
+    offset = (page - 1) * page_size
+
+    incidents = query.order_by(
+        Incident.created_at.desc()
+    ).offset(offset).limit(page_size).all()
+
+    return {
+    "items": incidents,
+    "total": total,
+    "page": page,
+    "page_size": page_size,
+    "total_pages": total_pages
+}
 
 
 def get_incident_by_id(

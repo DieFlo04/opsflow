@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
@@ -8,7 +8,10 @@ from backend.app.models.user import User
 from backend.app.schemas.incident import (
     IncidentCreate,
     IncidentUpdate,
-    IncidentResponse
+    IncidentResponse,
+    IncidentListResponse,
+    IncidentPriority,
+    IncidentStatus
 )
 from backend.app.services.incident_service import (
     category_exists,
@@ -28,15 +31,26 @@ router = APIRouter(
 )
 
 
-@router.get(
-    "/",
-    response_model=list[IncidentResponse]
-)
+@router.get("/", response_model=IncidentListResponse)
 def list_incidents(
+    status: IncidentStatus | None = None,
+    priority: IncidentPriority | None = None,
+    system_id: int | None = None,
+    category_id: int | None = None,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return get_incidents(db)
+    return get_incidents(
+        db,
+        status=status.value if status else None,
+        priority=priority.value if priority else None,
+        system_id=system_id,
+        category_id=category_id,
+        page=page,
+        page_size=page_size
+    )
 
 
 @router.get(
