@@ -229,3 +229,49 @@ def test_search_incidents_without_authentication():
     )
 
     assert response.status_code == 401
+    
+
+def test_sort_incidents_by_title_ascending():
+    response = client.get(
+        "/api/incidents/?sort_by=title&sort_order=asc",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    titles = [incident["title"] for incident in data["items"]]
+
+    assert titles == sorted(titles)
+
+
+def test_sort_incidents_by_title_descending():
+    response = client.get(
+        "/api/incidents/?sort_by=title&sort_order=desc",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    titles = [incident["title"] for incident in data["items"]]
+
+    assert titles == sorted(titles, reverse=True)
+
+
+def test_invalid_sort_field_returns_400():
+    response = client.get(
+        "/api/incidents/?sort_by=password_hash",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 400
+
+
+def test_invalid_sort_order_returns_400():
+    response = client.get(
+        "/api/incidents/?sort_order=random",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 400

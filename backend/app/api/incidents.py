@@ -38,21 +38,28 @@ def list_incidents(
     system_id: int | None = None,
     category_id: int | None = None,
     search: str | None = None,
+    sort_by: str = "created_at",
+    sort_order: str = "desc",
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    try:
         return get_incidents(
-        db,
-        status=status.value if status else None,
-        priority=priority.value if priority else None,
-        system_id=system_id,
-        category_id=category_id,
-        search=search,
-        page=page,
-        page_size=page_size
-    )
+            db,
+            status=status.value if status else None,
+            priority=priority.value if priority else None,
+            system_id=system_id,
+            category_id=category_id,
+            search=search,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            page=page,
+            page_size=page_size
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
 
 
 @router.get(

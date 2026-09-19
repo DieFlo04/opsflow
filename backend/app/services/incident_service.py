@@ -13,6 +13,15 @@ ALLOWED_STATUS_TRANSITIONS = {
     "CLOSED": {"CLOSED", "IN_PROGRESS"},
 }
 
+ALLOWED_SORT_FIELDS = {
+    "created_at": Incident.created_at,
+    "updated_at": Incident.updated_at,
+    "priority": Incident.priority,
+    "status": Incident.status,
+    "title": Incident.title,
+}
+
+ALLOWED_SORT_ORDERS = {"asc", "desc"}
 
 def get_incidents(
     db: Session,
@@ -21,6 +30,8 @@ def get_incidents(
     system_id: int | None = None,
     category_id: int | None = None,
     search: str | None = None,
+    sort_by: str = "created_at",
+    sort_order: str = "desc",
     page: int = 1,
     page_size: int = 10
 ):
@@ -52,9 +63,20 @@ def get_incidents(
 
     offset = (page - 1) * page_size
 
-    incidents = query.order_by(
-        Incident.created_at.desc()
-    ).offset(offset).limit(page_size).all()
+    sort_column = ALLOWED_SORT_FIELDS.get(sort_by)
+
+    if sort_column is None:
+        raise ValueError(f"Invalid sort field: {sort_by}")
+
+    if sort_order not in ALLOWED_SORT_ORDERS:
+        raise ValueError(f"Invalid sort order: {sort_order}")
+
+    if sort_order == "asc":
+        query = query.order_by(sort_column.asc())
+    else:
+        query = query.order_by(sort_column.desc())
+
+    incidents = query.offset(offset).limit(page_size).all()
 
     return {
     "items": incidents,
