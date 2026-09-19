@@ -191,3 +191,41 @@ def test_incidents_without_authentication():
     response = client.get("/api/incidents/")
 
     assert response.status_code == 401
+    
+
+def test_search_incidents_by_title():
+    response = client.get(
+        "/api/incidents/?search=servidor",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    for incident in data["items"]:
+        text = f"{incident['title']} {incident['description']}".lower()
+        assert "servidor" in text
+
+
+def test_search_incidents_is_case_insensitive():
+    response = client.get(
+        "/api/incidents/?search=SERVIDOR",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    for incident in data["items"]:
+        text = f"{incident['title']} {incident['description']}".lower()
+        assert "servidor" in text
+
+
+def test_search_incidents_without_authentication():
+    response = client.get(
+        "/api/incidents/?search=servidor"
+    )
+
+    assert response.status_code == 401

@@ -20,6 +20,7 @@ def get_incidents(
     priority: str | None = None,
     system_id: int | None = None,
     category_id: int | None = None,
+    search: str | None = None,
     page: int = 1,
     page_size: int = 10
 ):
@@ -36,6 +37,14 @@ def get_incidents(
 
     if category_id is not None:
         query = query.filter(Incident.category_id == category_id)
+        
+    if search is not None:
+        search_term = f"%{search}%"
+
+        query = query.filter(
+            Incident.title.ilike(search_term)
+            | Incident.description.ilike(search_term)
+        )
 
     total = query.count()
     

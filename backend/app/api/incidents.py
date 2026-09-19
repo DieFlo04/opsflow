@@ -37,17 +37,19 @@ def list_incidents(
     priority: IncidentPriority | None = None,
     system_id: int | None = None,
     category_id: int | None = None,
+    search: str | None = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return get_incidents(
+        return get_incidents(
         db,
         status=status.value if status else None,
         priority=priority.value if priority else None,
         system_id=system_id,
         category_id=category_id,
+        search=search,
         page=page,
         page_size=page_size
     )
