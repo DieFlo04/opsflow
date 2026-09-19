@@ -259,19 +259,19 @@ def test_sort_incidents_by_title_descending():
     assert titles == sorted(titles, reverse=True)
 
 
-def test_invalid_sort_field_returns_400():
+def test_invalid_sort_field_returns_422():
     response = client.get(
         "/api/incidents/?sort_by=password_hash",
         headers=auth_headers()
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
-def test_invalid_sort_order_returns_400():
+def test_invalid_sort_order_returns_422():
     response = client.get(
         "/api/incidents/?sort_order=random",
         headers=auth_headers()
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422

@@ -18,6 +18,19 @@ class IncidentStatus(str, Enum):
     CLOSED = "CLOSED"
 
 
+class IncidentSortField(str, Enum):
+    CREATED_AT = "created_at"
+    UPDATED_AT = "updated_at"
+    PRIORITY = "priority"
+    STATUS = "status"
+    TITLE = "title"
+
+
+class IncidentSortOrder(str, Enum):
+    ASC = "asc"
+    DESC = "desc"
+
+
 class IncidentCreate(BaseModel):
     title: str
     description: str

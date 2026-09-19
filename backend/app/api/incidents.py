@@ -11,7 +11,9 @@ from backend.app.schemas.incident import (
     IncidentResponse,
     IncidentListResponse,
     IncidentPriority,
-    IncidentStatus
+    IncidentStatus,
+    IncidentSortField,
+    IncidentSortOrder
 )
 from backend.app.services.incident_service import (
     category_exists,
@@ -38,8 +40,8 @@ def list_incidents(
     system_id: int | None = None,
     category_id: int | None = None,
     search: str | None = None,
-    sort_by: str = "created_at",
-    sort_order: str = "desc",
+    sort_by: IncidentSortField = IncidentSortField.CREATED_AT,
+    sort_order: IncidentSortOrder = IncidentSortOrder.DESC,
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
@@ -53,8 +55,8 @@ def list_incidents(
             system_id=system_id,
             category_id=category_id,
             search=search,
-            sort_by=sort_by,
-            sort_order=sort_order,
+            sort_by=sort_by.value,
+            sort_order=sort_order.value,
             page=page,
             page_size=page_size
         )
