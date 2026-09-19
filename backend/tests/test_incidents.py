@@ -275,3 +275,62 @@ def test_invalid_sort_order_returns_422():
     )
 
     assert response.status_code == 422
+    
+
+def test_filter_incidents_by_created_from():
+    response = client.get(
+        "/api/incidents/?created_from=2026-01-01",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    for incident in data["items"]:
+        assert incident["created_at"] >= "2026-01-01"
+
+
+def test_filter_incidents_by_created_to():
+    response = client.get(
+        "/api/incidents/?created_to=2030-12-31",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    for incident in data["items"]:
+        assert incident["created_at"] < "2031-01-01"
+
+
+def test_filter_incidents_by_created_date_range():
+    response = client.get(
+        "/api/incidents/?created_from=2026-01-01&created_to=2030-12-31",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    for incident in data["items"]:
+        assert incident["created_at"] >= "2026-01-01"
+        assert incident["created_at"] < "2031-01-01"
+
+
+def test_filter_incidents_with_date_range_and_status():
+    response = client.get(
+        "/api/incidents/?created_from=2026-01-01&created_to=2030-12-31&status=OPEN",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    for incident in data["items"]:
+        assert incident["created_at"] >= "2026-01-01"
+        assert incident["created_at"] < "2031-01-01"
+        assert incident["status"] == "OPEN"

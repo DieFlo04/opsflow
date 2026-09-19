@@ -1,5 +1,5 @@
 import math
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 from sqlalchemy.orm import Session
 
@@ -30,6 +30,8 @@ def get_incidents(
     system_id: int | None = None,
     category_id: int | None = None,
     search: str | None = None,
+    created_from: date | None = None,
+    created_to: date | None = None,
     sort_by: str = "created_at",
     sort_order: str = "desc",
     page: int = 1,
@@ -55,6 +57,21 @@ def get_incidents(
         query = query.filter(
             Incident.title.ilike(search_term)
             | Incident.description.ilike(search_term)
+        )
+        
+    if created_from is not None:
+        query = query.filter(
+            Incident.created_at >= datetime.combine(created_from, datetime.min.time())
+        )
+
+    if created_to is not None:
+        created_to_exclusive = datetime.combine(
+            created_to + timedelta(days=1),
+            datetime.min.time()
+        )
+
+        query = query.filter(
+            Incident.created_at < created_to_exclusive
         )
 
     total = query.count()

@@ -1,3 +1,4 @@
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -40,6 +41,8 @@ def list_incidents(
     system_id: int | None = None,
     category_id: int | None = None,
     search: str | None = None,
+    created_from: date | None = None,
+    created_to: date | None = None,
     sort_by: IncidentSortField = IncidentSortField.CREATED_AT,
     sort_order: IncidentSortOrder = IncidentSortOrder.DESC,
     page: int = Query(1, ge=1),
@@ -55,6 +58,8 @@ def list_incidents(
             system_id=system_id,
             category_id=category_id,
             search=search,
+            created_from=created_from,
+            created_to=created_to,
             sort_by=sort_by.value,
             sort_order=sort_order.value,
             page=page,
