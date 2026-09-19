@@ -334,3 +334,45 @@ def test_filter_incidents_with_date_range_and_status():
         assert incident["created_at"] >= "2026-01-01"
         assert incident["created_at"] < "2031-01-01"
         assert incident["status"] == "OPEN"
+        
+def test_filter_incidents_by_created_by():
+    response = client.get(
+        "/api/incidents/?created_by=1",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    for incident in data["items"]:
+        assert incident["created_by"] == 1
+
+
+def test_filter_incidents_by_assigned_to():
+    response = client.get(
+        "/api/incidents/?assigned_to=1",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    for incident in data["items"]:
+        assert incident["assigned_to"] == 1
+
+
+def test_filter_incidents_by_created_by_and_assigned_to():
+    response = client.get(
+        "/api/incidents/?created_by=1&assigned_to=1",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    for incident in data["items"]:
+        assert incident["created_by"] == 1
+        assert incident["assigned_to"] == 1

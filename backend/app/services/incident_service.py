@@ -29,6 +29,8 @@ def get_incidents(
     priority: str | None = None,
     system_id: int | None = None,
     category_id: int | None = None,
+    created_by: int | None = None,
+    assigned_to: int | None = None,
     search: str | None = None,
     created_from: date | None = None,
     created_to: date | None = None,
@@ -50,6 +52,12 @@ def get_incidents(
 
     if category_id is not None:
         query = query.filter(Incident.category_id == category_id)
+    
+    if created_by is not None:
+        query = query.filter(Incident.created_by == created_by)
+
+    if assigned_to is not None:
+        query = query.filter(Incident.assigned_to == assigned_to)
         
     if search is not None:
         search_term = f"%{search}%"
