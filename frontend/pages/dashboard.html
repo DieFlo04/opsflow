@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OpsFlow - Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/styles.css"
+    >
+</head>
+
+<body>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <h1>OpsFlow</h1>
+            <span>IT Operations & Automation Platform</span>
+        </div>
+
+        <div class="topbar-right">
+            <span id="user-info">Cargando usuario...</span>
+
+            <button
+                id="logout-button"
+                class="btn btn-secondary"
+            >
+                Cerrar sesión
+            </button>
+        </div>
+    </header>
+
+
+    <main class="dashboard-container">
+
+        <!-- =========================
+             Bienvenida
+             ========================= -->
+
+        <section class="welcome-card">
+
+            <div>
+                <h2>Dashboard</h2>
+
+                <p>
+                    Monitoreo y análisis operativo de incidentes
+                </p>
+            </div>
+
+            <button
+                id="incidents-button"
+                class="btn btn-primary"
+            >
+                Ver incidentes
+            </button>
+
+        </section>
+
+
+        <!-- =========================
+             Métricas principales
+             ========================= -->
+
+        <section class="metrics-grid">
+
+            <div class="metric-card">
+                <span>Total de incidentes</span>
+                <strong id="total-incidents">-</strong>
+            </div>
+
+            <div class="metric-card">
+                <span>Incidentes abiertos</span>
+                <strong id="open-incidents">-</strong>
+            </div>
+
+            <div class="metric-card">
+                <span>En progreso</span>
+                <strong id="in-progress-incidents">-</strong>
+            </div>
+
+            <div class="metric-card">
+                <span>Resueltos</span>
+                <strong id="resolved-incidents">-</strong>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             Métricas analíticas
+             ========================= -->
+
+        <section class="analytics-grid">
+
+            <div class="analytics-card">
+
+                <div class="analytics-header">
+                    <div>
+                        <h2>Incidentes por prioridad</h2>
+
+                        <p>
+                            Distribución de incidentes según prioridad
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    id="priority-metrics"
+                    class="analytics-list"
+                >
+                    <p>Cargando datos...</p>
+                </div>
+
+            </div>
+
+
+            <div class="analytics-card">
+
+                <div class="analytics-header">
+                    <div>
+                        <h2>Incidentes por estado</h2>
+
+                        <p>
+                            Distribución de incidentes según estado
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    id="status-metrics"
+                    class="analytics-list"
+                >
+                    <p>Cargando datos...</p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             Gráficas
+             ========================= -->
+
+        <section class="charts-grid">
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+                    <h2>Distribución por prioridad</h2>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="priority-chart"></canvas>
+                </div>
+
+            </div>
+
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+                    <h2>Distribución por estado</h2>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="status-chart"></canvas>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             Análisis operativo
+             ========================= -->
+
+        <section class="analysis-card">
+
+            <div class="analysis-header">
+
+                <div>
+                    <h2>Análisis operativo</h2>
+
+                    <p>
+                        Alertas generadas automáticamente por OpsFlow
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="analysis-summary">
+
+                <div class="analysis-stat">
+                    <span>Incidentes abiertos</span>
+                    <strong id="analysis-open">-</strong>
+                </div>
+
+                <div class="analysis-stat">
+                    <span>Incidentes críticos</span>
+                    <strong id="analysis-critical">-</strong>
+                </div>
+
+                <div class="analysis-stat">
+                    <span>Incidentes antiguos</span>
+                    <strong id="analysis-old">-</strong>
+                </div>
+
+            </div>
+
+
+            <div
+                id="alerts-container"
+                class="alerts-container"
+            >
+                <p>Cargando análisis...</p>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             Análisis de resolución
+             ========================= -->
+
+        <section class="resolution-card">
+
+            <div class="resolution-header">
+
+                <div>
+                    <h2>Análisis de resolución</h2>
+
+                    <p>
+                        Tiempo empleado en resolver incidentes
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="resolution-summary">
+
+                <div class="resolution-stat">
+                    <span>Tiempo promedio</span>
+
+                    <strong id="average-resolution-time">
+                        -
+                    </strong>
+                </div>
+
+
+                <div class="resolution-stat">
+                    <span>Incidentes resueltos</span>
+
+                    <strong id="resolved-incidents-count">
+                        -
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="resolution-table-container">
+
+                <table class="resolution-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Incidente</th>
+                            <th>Prioridad</th>
+                            <th>Tiempo de resolución</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="resolution-table-body">
+
+                        <tr>
+                            <td colspan="3">
+                                Cargando datos...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             Análisis por sistema
+             ========================= -->
+
+        <section class="system-analysis-card">
+
+            <div class="system-analysis-header">
+
+                <div>
+                    <h2>Incidentes por sistema</h2>
+
+                    <p>
+                        Distribución de incidentes según el sistema afectado
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="system-chart-container">
+
+                <canvas id="system-chart"></canvas>
+
+            </div>
+
+
+            <div
+                id="system-metrics-list"
+                class="system-metrics-list"
+            >
+                <p>Cargando datos...</p>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Chart.js -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+
+    <!-- Dashboard JavaScript -->
+
+    <script
+        src="../js/dashboard.js"
+    ></script>
+
+</body>
+</html>

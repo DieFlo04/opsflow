@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OpsFlow - Detalle del incidente</title>
+
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+    <main class="dashboard-container">
+
+        <section class="dashboard-header">
+
+            <div>
+                <h1>OpsFlow</h1>
+                <p>Detalle del incidente</p>
+            </div>
+
+            <div>
+
+                <button
+                    id="back-button"
+                    class="secondary-button"
+                >
+                    Incidentes
+                </button>
+
+                <button
+                    id="logout-button"
+                    class="logout-button"
+                >
+                    Cerrar sesión
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <section class="incident-detail-card">
+
+            <div id="loading-message">
+                Cargando incidente...
+            </div>
+
+
+            <div id="incident-detail" style="display: none;">
+
+                <div
+    id="edit-section"
+    class="edit-section"
+    style="display: none;"
+>
+
+    <h3>Editar incidente</h3>
+
+    <form id="edit-form">
+
+        <div class="edit-grid">
+
+            <div class="form-group">
+
+                <label for="edit-title">
+                    Título
+                </label>
+
+                <input
+                    type="text"
+                    id="edit-title"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="edit-priority">
+                    Prioridad
+                </label>
+
+                <select id="edit-priority">
+
+                    <option value="LOW">
+                        Baja
+                    </option>
+
+                    <option value="MEDIUM">
+                        Media
+                    </option>
+
+                    <option value="HIGH">
+                        Alta
+                    </option>
+
+                    <option value="CRITICAL">
+                        Crítica
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="edit-status">
+                    Estado
+                </label>
+
+                <select id="edit-status">
+
+                    <option value="OPEN">
+                        Abierto
+                    </option>
+
+                    <option value="IN_PROGRESS">
+                        En progreso
+                    </option>
+
+                    <option value="RESOLVED">
+                        Resuelto
+                    </option>
+
+                    <option value="CLOSED">
+                        Cerrado
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="edit-assigned-to">
+                    Asignado a
+                </label>
+
+                <input
+                    type="number"
+                    id="edit-assigned-to"
+                    placeholder="ID del usuario"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="edit-description">
+                Descripción
+            </label>
+
+            <textarea
+                id="edit-description"
+                rows="5"
+                required
+            ></textarea>
+
+        </div>
+
+
+        <div class="edit-actions">
+
+            <button
+                type="submit"
+                class="login-button"
+            >
+                Guardar cambios
+            </button>
+
+            <button
+                type="button"
+                id="cancel-edit"
+                class="secondary-button"
+            >
+                Cancelar
+            </button>
+
+        </div>
+
+
+        <p
+            id="edit-message"
+            class="login-message"
+        ></p>
+
+    </form>
+
+</div>
+
+                <div class="detail-header">
+
+                    <div>
+                        <span id="incident-id"></span>
+
+                        <h2 id="incident-title"></h2>
+                    </div>
+
+                    <button
+                        id="edit-button"
+                        class="login-button edit-button"
+                    >
+                        Editar incidente
+                    </button>
+
+                </div>
+
+
+                <div class="detail-grid">
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Prioridad
+                        </span>
+
+                        <span id="incident-priority"></span>
+                    </div>
+
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Estado
+                        </span>
+
+                        <span id="incident-status"></span>
+                    </div>
+
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Sistema
+                        </span>
+
+                        <span id="incident-system"></span>
+                    </div>
+
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Categoría
+                        </span>
+
+                        <span id="incident-category"></span>
+                    </div>
+
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Creado por
+                        </span>
+
+                        <span id="incident-created-by"></span>
+                    </div>
+
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Asignado a
+                        </span>
+
+                        <span id="incident-assigned-to"></span>
+                    </div>
+
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Fecha de creación
+                        </span>
+
+                        <span id="incident-created-at"></span>
+                    </div>
+
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Última actualización
+                        </span>
+
+                        <span id="incident-updated-at"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="description-section">
+
+                    <h3>Descripción</h3>
+
+                    <p id="incident-description"></p>
+
+                </div>
+
+
+                <div
+                    class="description-section"
+                    id="resolved-section"
+                    style="display: none;"
+                >
+
+                    <h3>Fecha de resolución</h3>
+
+                    <p id="incident-resolved-at"></p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="error-message"
+                class="empty-message"
+                style="display: none;"
+            >
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="../js/incident-detail.js"></script>
+
+</body>
+</html>

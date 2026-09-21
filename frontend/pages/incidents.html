@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OpsFlow - Incidentes</title>
+
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+    <main class="dashboard-container">
+
+        <section class="dashboard-header">
+
+            <div>
+                <h1>OpsFlow</h1>
+                <p>Gestión de incidentes</p>
+            </div>
+
+            <div>
+                <button id="back-button" class="secondary-button">
+                    Dashboard
+                </button>
+
+                <button id="logout-button" class="logout-button">
+                    Cerrar sesión
+                </button>
+            </div>
+
+        </section>
+
+
+        <section class="incidents-content">
+
+            <div class="incidents-header">
+
+    <div>
+        <h2>Incidentes</h2>
+
+        <p id="incident-count">
+            Cargando incidentes...
+        </p>
+    </div>
+
+    <button
+        id="new-incident-button"
+        class="login-button new-incident-button"
+    >
+        + Nuevo incidente
+    </button>
+
+</div>
+
+
+            <div class="filters-card">
+
+                <div class="filter-group">
+
+                    <label for="search">
+                        Buscar
+                    </label>
+
+                    <input
+                        type="text"
+                        id="search"
+                        placeholder="Buscar por título o descripción"
+                    >
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label for="status">
+                        Estado
+                    </label>
+
+                    <select id="status">
+
+                        <option value="">
+                            Todos
+                        </option>
+
+                        <option value="OPEN">
+                            Abierto
+                        </option>
+
+                        <option value="IN_PROGRESS">
+                            En progreso
+                        </option>
+
+                        <option value="RESOLVED">
+                            Resuelto
+                        </option>
+
+                        <option value="CLOSED">
+                            Cerrado
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label for="priority">
+                        Prioridad
+                    </label>
+
+                    <select id="priority">
+
+                        <option value="">
+                            Todas
+                        </option>
+
+                        <option value="LOW">
+                            Baja
+                        </option>
+
+                        <option value="MEDIUM">
+                            Media
+                        </option>
+
+                        <option value="HIGH">
+                            Alta
+                        </option>
+
+                        <option value="CRITICAL">
+                            Crítica
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    id="filter-button"
+                    class="login-button filter-button"
+                >
+                    Aplicar filtros
+                </button>
+
+            </div>
+
+
+            <div class="table-card">
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Prioridad</th>
+                                <th>Estado</th>
+                                <th>Sistema</th>
+                                <th>Creado por</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="incidents-table-body">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div
+                    id="empty-message"
+                    class="empty-message"
+                >
+                    No se encontraron incidentes.
+                </div>
+
+            </div>
+
+
+            <div class="pagination">
+
+                <button
+                    id="previous-button"
+                    class="secondary-button"
+                >
+                    Anterior
+                </button>
+
+                <span id="page-info">
+                    Página 1
+                </span>
+
+                <button
+                    id="next-button"
+                    class="secondary-button"
+                >
+                    Siguiente
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="../js/incidents.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OpsFlow - Nuevo incidente</title>
+
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+    <main class="dashboard-container">
+
+        <section class="dashboard-header">
+
+            <div>
+                <h1>OpsFlow</h1>
+                <p>Crear nuevo incidente</p>
+            </div>
+
+            <button
+                id="logout-button"
+                class="logout-button"
+            >
+                Cerrar sesión
+            </button>
+
+        </section>
+
+
+        <section class="create-incident-card">
+
+            <h2>Nuevo incidente</h2>
+
+            <form id="create-incident-form">
+
+                <div class="form-group">
+
+                    <label for="title">
+                        Título
+                    </label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        required
+                        maxlength="200"
+                        placeholder="Ej. Servidor de producción no responde"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="description">
+                        Descripción
+                    </label>
+
+                    <textarea
+                        id="description"
+                        rows="6"
+                        required
+                        placeholder="Describe el problema..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="create-grid">
+
+                    <div class="form-group">
+
+                        <label for="priority">
+                            Prioridad
+                        </label>
+
+                        <select id="priority">
+
+                            <option value="LOW">
+                                Baja
+                            </option>
+
+                            <option value="MEDIUM" selected>
+                                Media
+                            </option>
+
+                            <option value="HIGH">
+                                Alta
+                            </option>
+
+                            <option value="CRITICAL">
+                                Crítica
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="system-id">
+                            ID del sistema
+                        </label>
+
+                        <input
+                            type="number"
+                            id="system-id"
+                            required
+                            min="1"
+                            value="2"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="category-id">
+                            ID de categoría
+                        </label>
+
+                        <input
+                            type="number"
+                            id="category-id"
+                            required
+                            min="1"
+                            value="1"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="create-actions">
+
+                    <button
+                        type="submit"
+                        class="login-button"
+                    >
+                        Crear incidente
+                    </button>
+
+                    <button
+                        type="button"
+                        id="cancel-button"
+                        class="secondary-button"
+                    >
+                        Cancelar
+                    </button>
+
+                </div>
+
+
+                <p
+                    id="create-message"
+                    class="login-message"
+                ></p>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script src="../js/create-incident.js"></script>
+
+</body>
+</html>
